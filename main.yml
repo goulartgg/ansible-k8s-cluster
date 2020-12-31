@@ -1,0 +1,26 @@
+#Execução para todas as instancias declaradas no hosts.yml
+- hosts: all
+  become: yes #Indica se é necessáriode sudo.
+  user: ubuntu
+  gather_facts: no #Coleta de meta-dados pelo ansible, por default é true.
+  pre_tasks: #Executando comando para garantir que exista o python para seguir com as roles.
+  - name: 'Updating repo'
+    raw: 'apt-get update'
+  - name: 'Installing python'
+    raw: 'apt-get install -y python'
+  roles:
+  - {role: install-k8s,     tags: [install_k8s_role]}
+
+#Execução apenas para as instancias declaradas como k8s-master no hosts.yml
+- hosts: k8s-master
+  become: yes
+  user: ubuntu
+  roles:
+  - {role: create-cluster,  tags: ["create_cluster_role"]}
+
+#Execução apenas para as instancias declaradas como k8s-workers no hosts.yml serão afetadas
+- hosts: k8s-workers
+  become: yes
+  user: ubuntu
+  roles:
+  - {role: join-workers,    tags: ["join_workers_role"]}

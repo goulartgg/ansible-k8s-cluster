@@ -1,0 +1,24 @@
+---
+# tasks file for install-k8s
+- name: Installing Docker
+  shell: curl -fsSL https://get.docker.com | bash -
+
+- name: Adding k8s repo keys to apt
+  apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+
+- name: Adding k8s repo
+  apt_repository:
+    repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+    state: present
+
+- name: Install k8s packages
+  apt:
+  # {{ }} Indica a utilização de variavel
+    name: "{{ packages }}"
+  vars:
+    packages:
+    - kubelet
+    - kubeadm
+    - kubectl
